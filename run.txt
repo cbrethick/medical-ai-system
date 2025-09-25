@@ -1,0 +1,4 @@
+source venv/bin/activate
+python -m venv venv
+python3 models/train_models.py
+python app.py       

@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Medical Diagnosis System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Your existing CSS styles here */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .disease-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .disease-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            font-weight: 600;
+        }
+        
+        .prediction-form {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .result-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .risk-high {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .risk-medium {
+            color: var(--warning);
+            font-weight: bold;
+        }
+        
+        .risk-low {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .factor-bar {
+            height: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            background-color: #e0e0e0;
+        }
+        
+        .factor-value {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary);
+        }
+        
+        .upload-area.active {
+            border-color: var(--secondary);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .disease-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-stethoscope me-2"></i>MediAI Diagnostics
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#diseases">Diseases</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">AI-Powered Medical Diagnosis</h1>
+                    <p class="lead mb-4">Early detection of diseases using advanced machine learning algorithms. Get risk assessments for various medical conditions based on your symptoms and test results.</p>
+                    <a href="#diseases" class="btn btn-primary btn-lg">Get Started <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+                <div class="col-lg-6">
+                   <div class="text-center mb-4">
+    <div class="ai-medical-icon">
+        <i class="fas fa-brain fa-3x text-primary me-3"></i>
+        <i class="fas fa-heartbeat fa-3x text-danger"></i>
+    </div>
+    <h3 class="mt-3">AI-Powered Medical Diagnosis</h3>
+    <p class="text-muted">Healthcare predictions</p>
+</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disease Selection -->
+<section id="diseases" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Select a Disease for Prediction</h2>
+        
+        <div class="row">
+            <!-- Disease Cards - First 6 visible by default -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="diabetes">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-syringe"></i>Diabetes Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess your risk for diabetes based on lifestyle factors and medical history.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="heart">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-heartbeat"></i>Heart Disease Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate your cardiovascular health and heart disease risk factors.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="breast_cancer">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-dna"></i>Breast Cancer Risk Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess breast cancer risk based on genetic, lifestyle, and clinical factors.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="lung_cancer">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-lungs"></i>Lung Cancer Risk Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate lung cancer risk based on smoking history and symptoms.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="kidney_disease">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-kidneys"></i>Kidney Disease Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess kidney function and disease risk based on lab results.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card disease-card" data-disease="liver_disease">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-liver"></i>Liver Disease Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate liver health and detect potential liver disease risks.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden diseases (shown when "Show All Diseases" is clicked) -->
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="stroke">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-brain"></i>Stroke Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess your risk of stroke based on health indicators and lifestyle.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="hypertension">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-tachometer-alt"></i>Hypertension Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Monitor and predict hypertension risk based on vital signs.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="parkinsons">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-hand-paper"></i>Parkinson's Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Early detection of Parkinson's disease risk factors.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="alzheimer">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-memory"></i>Alzheimer's Risk Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess risk factors for Alzheimer's disease and cognitive decline.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="obesity">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-weight"></i>Obesity Risk Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate obesity risk and related health complications.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="anemia">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-tint"></i>Anemia Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Detect anemia risk based on blood parameters and symptoms.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="asthma">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-wind"></i>Asthma Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess asthma risk and respiratory health indicators.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="covid19">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-virus"></i>COVID-19 Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Predict COVID-19 infection risk based on symptoms and exposure.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="tuberculosis">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-lungs-virus"></i>Tuberculosis Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Detect tuberculosis risk based on symptoms and medical history.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="thyroid">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-butterfly"></i>Thyroid Disorder Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate thyroid function and detect potential disorders.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="skin_cancer">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-user-md"></i>Skin Cancer Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess skin cancer risk based on dermatological factors.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="depression">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-smile"></i>Depression Risk Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Evaluate mental health and depression risk factors.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="pneumonia">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-head-side-cough"></i>Pneumonia Detection
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Detect pneumonia risk based on respiratory symptoms.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 disease-hidden">
+                <div class="card disease-card" data-disease="gastrointestinal">
+                    <div class="card-header">
+                        <i class="disease-icon fas fa-stomach"></i>Gastrointestinal Disease Prediction
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Assess gastrointestinal health and detect potential disorders.</p>
+                        <button class="btn btn-outline-primary select-disease">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Show more/less diseases button -->
+        <div class="col-12 text-center mt-4">
+            <button class="btn btn-outline-secondary" id="toggleDiseases">Show All Diseases</button>
+        </div>
+    </div>
+</section>
+
+    <!-- Prediction Form Section -->
+    <section id="prediction" class="py-5" style="display: none;">
+        <div class="container">
+            <h2 class="text-center mb-4" id="disease-title">Disease Prediction</h2>
+            
+            <div class="prediction-form">
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <h4>Medical Data Entry</h4>
+                        
+                        <!-- Dynamic form fields will be inserted here -->
+                        <form id="medical-form">
+                            <div id="dynamic-form">
+                                <!-- Form fields will be generated based on selected disease -->
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button type="button" class="btn btn-primary" id="predict-btn">
+                                    <span class="loading-spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                    <span class="btn-text">Predict Risk</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="back-to-diseases">Back to Diseases</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="result-container" id="result-container">
+                <h3 class="text-center mb-4">Prediction Results</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Risk Assessment</h4>
+                        <div class="risk-score mb-4">
+                            <h5>Overall Risk: <span id="risk-level" class="risk-medium">Calculating...</span></h5>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" id="risk-progress">0%</div>
+                            </div>
+                        </div>
+                        
+                        <div id="risk-factors">
+                            <h5>Key Contributing Factors</h5>
+                            <!-- Factor bars will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h4>Visualization</h4>
+                        <canvas id="riskChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Recommendations</h5>
+                    <div id="recommendations">
+                        <!-- Recommendations will be inserted here -->
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" id="new-prediction">Make Another Prediction</button>
+                    <button class="btn btn-outline-secondary" id="save-results">Save Results</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">About Our AI System</h2>
+            <div class="row">
+                <div class="col-md-4 text-center mb-4">
+                    <i class="fas fa-brain feature-icon"></i>
+                    <h4>Advanced AI Algorithms</h4>
+                    <p>Our system uses state-of-the-art machine learning models trained on extensive medical datasets.</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h4>Privacy & Security</h4>
+                    <p>Your medical data is encrypted and handled with the highest security standards.</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <i class="fas fa-user-md feature-icon"></i>
+                    <h4>Clinical Validation</h4>
+                    <p>All predictions are validated against clinical standards and should be discussed with healthcare professionals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>MediAI Diagnostics</h5>
+                    <p>AI-powered early disease detection system for better healthcare outcomes.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="fas fa-envelope me-2"></i> rethickcb2007@gmail.com</p>
+                    <p><i class="fas fa-phone me-2"></i> +916383686510</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Disclaimer</h5>
+                    <p>This system provides risk assessments based on available data. Always consult with healthcare professionals for medical diagnosis.</p>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="text-center">
+                <p>&copy; 2025 MediAI Diagnostics By RETHICKCB. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM elements
+        const diseaseCards = document.querySelectorAll('.disease-card');
+        const predictionSection = document.getElementById('prediction');
+        const diseaseTitle = document.getElementById('disease-title');
+        const dynamicForm = document.getElementById('dynamic-form');
+        const predictBtn = document.getElementById('predict-btn');
+        const resultContainer = document.getElementById('result-container');
+        const riskLevel = document.getElementById('risk-level');
+        const riskProgress = document.getElementById('risk-progress');
+        const riskFactors = document.getElementById('risk-factors');
+        const recommendations = document.getElementById('recommendations');
+        const newPredictionBtn = document.getElementById('new-prediction');
+        const backToDiseasesBtn = document.getElementById('back-to-diseases');
+        const showMoreDiseasesBtn = document.getElementById('showMoreDiseases');
+
+        let currentDisease = '';
+
+        // Event listeners
+        diseaseCards.forEach(card => {
+            card.querySelector('.select-disease').addEventListener('click', function() {
+                const disease = card.getAttribute('data-disease');
+                showPredictionForm(disease);
+            });
+        });
+
+        predictBtn.addEventListener('click', function() {
+            makePrediction();
+        });
+
+        newPredictionBtn.addEventListener('click', function() {
+            resultContainer.style.display = 'none';
+            dynamicForm.innerHTML = '';
+            showPredictionForm(currentDisease);
+        });
+
+        backToDiseasesBtn.addEventListener('click', function() {
+            predictionSection.style.display = 'none';
+            resultContainer.style.display = 'none';
+            window.location.href = '#diseases';
+        });
+
+        // Functions
+        async function showPredictionForm(diseaseKey) {
+            currentDisease = diseaseKey;
+            
+            // Scroll to prediction section
+            predictionSection.scrollIntoView({ behavior: 'smooth' });
+            predictionSection.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            // Set disease title
+            diseaseTitle.textContent = getDiseaseDisplayName(diseaseKey);
+            
+            // Load form fields from backend
+            try {
+                const response = await fetch(`/get_disease_inputs/${diseaseKey}`);
+                const inputs = await response.json();
+                
+                if (response.ok) {
+                    generateFormFields(inputs);
+                } else {
+                    throw new Error(inputs.error);
+                }
+            } catch (error) {
+                console.error('Error loading form fields:', error);
+                // Fallback to basic form
+                generateBasicFormFields(diseaseKey);
+            }
+        }
+
+        function generateFormFields(inputs) {
+            dynamicForm.innerHTML = '';
+            
+            inputs.forEach(input => {
+                const formGroup = document.createElement('div');
+                formGroup.className = 'mb-3';
+                
+                const label = document.createElement('label');
+                label.className = 'form-label';
+                label.textContent = input.label;
+                label.setAttribute('for', input.name);
+                
+                let inputElement;
+                if (input.type === 'select') {
+                    inputElement = document.createElement('select');
+                    inputElement.className = 'form-select';
+                    inputElement.id = input.name;
+                    inputElement.name = input.name;
+                    inputElement.required = true;
+                    
+                    input.options.forEach(option => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option.split(':')[0]; // Get value before colon
+                        optionElement.textContent = option;
+                        inputElement.appendChild(optionElement);
+                    });
+                } else {
+                    inputElement = document.createElement('input');
+                    inputElement.type = input.type;
+                    inputElement.className = 'form-control';
+                    inputElement.id = input.name;
+                    inputElement.name = input.name;
+                    inputElement.required = true;
+                    
+                    if (input.placeholder) {
+                        inputElement.placeholder = input.placeholder;
+                    }
+                    if (input.min !== undefined) {
+                        inputElement.min = input.min;
+                    }
+                    if (input.max !== undefined) {
+                        inputElement.max = input.max;
+                    }
+                    if (input.step) {
+                        inputElement.step = input.step;
+                    }
+                }
+                
+                formGroup.appendChild(label);
+                formGroup.appendChild(inputElement);
+                dynamicForm.appendChild(formGroup);
+            });
+        }
+
+        function generateBasicFormFields(diseaseKey) {
+    const basicFields = {
+        'diabetes': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'glucose_level', type: 'number', label: 'Glucose Level', placeholder: 'mg/dL' },
+            { name: 'bmi', type: 'number', label: 'BMI', placeholder: 'Body Mass Index' },
+            { name: 'blood_pressure', type: 'text', label: 'Blood Pressure', placeholder: 'e.g., 120/80' },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'physical_activity', type: 'select', label: 'Physical Activity', options: ['Sedentary', 'Light', 'Moderate', 'Active'] }
+        ],
+        'heart': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'blood_pressure', type: 'text', label: 'Blood Pressure', placeholder: 'e.g., 120/80' },
+            { name: 'cholesterol', type: 'number', label: 'Cholesterol Level', placeholder: 'mg/dL' },
+            { name: 'heart_rate', type: 'number', label: 'Heart Rate', placeholder: 'Beats per minute' },
+            { name: 'smoking', type: 'select', label: 'Smoking History', options: ['Non-smoker', 'Former smoker', 'Current smoker'] },
+            { name: 'diabetes_history', type: 'select', label: 'Diabetes History', options: ['No', 'Yes'] }
+        ],
+        'breast_cancer': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'tumor_size', type: 'number', label: 'Tumor Size (cm)', placeholder: 'Enter tumor size' },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'biopsy_cell_data', type: 'text', label: 'Biopsy Cell Data', placeholder: 'Describe cell features' },
+            { name: 'hormonal_factors', type: 'text', label: 'Hormonal Factors', placeholder: 'Menstrual/Reproductive history' }
+        ],
+        'lung_cancer': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'smoking_history', type: 'select', label: 'Smoking History', options: ['Non-smoker', 'Former smoker', 'Current smoker'] },
+            { name: 'chronic_cough', type: 'select', label: 'Chronic Cough', options: ['No', 'Yes'] },
+            { name: 'chest_pain', type: 'select', label: 'Chest Pain', options: ['No', 'Yes'] },
+            { name: 'environmental_exposure', type: 'text', label: 'Environmental Exposure', placeholder: 'Pollution, Asbestos, etc.' }
+        ],
+        'kidney_disease': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'blood_pressure', type: 'text', label: 'Blood Pressure', placeholder: 'e.g., 120/80' },
+            { name: 'creatinine', type: 'number', label: 'Creatinine Level', placeholder: 'mg/dL' },
+            { name: 'albumin_urine', type: 'number', label: 'Albumin in Urine', placeholder: 'mg/dL' },
+            { name: 'bun', type: 'number', label: 'Blood Urea Nitrogen (BUN)', placeholder: 'mg/dL' },
+            { name: 'diabetes_history', type: 'select', label: 'Diabetes History', options: ['No', 'Yes'] }
+        ],
+        'liver_disease': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'bilirubin', type: 'number', label: 'Bilirubin Level', placeholder: 'mg/dL' },
+            { name: 'alt', type: 'number', label: 'ALT Level', placeholder: 'U/L' },
+            { name: 'ast', type: 'number', label: 'AST Level', placeholder: 'U/L' },
+            { name: 'alcohol_consumption', type: 'select', label: 'Alcohol Consumption', options: ['None', 'Occasional', 'Regular'] },
+            { name: 'hepatitis_history', type: 'select', label: 'Hepatitis Infection History', options: ['No', 'Yes'] }
+        ],
+        'stroke': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'blood_pressure', type: 'text', label: 'Blood Pressure', placeholder: 'e.g., 120/80' },
+            { name: 'cholesterol', type: 'number', label: 'Cholesterol Level', placeholder: 'mg/dL' },
+            { name: 'diabetes_history', type: 'select', label: 'Diabetes History', options: ['No', 'Yes'] },
+            { name: 'smoking', type: 'select', label: 'Smoking History', options: ['Non-smoker', 'Former smoker', 'Current smoker'] },
+            { name: 'previous_stroke', type: 'select', label: 'Previous Stroke History', options: ['No', 'Yes'] }
+        ],
+        'hypertension': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'bmi', type: 'number', label: 'BMI', placeholder: 'Body Mass Index' },
+            { name: 'blood_pressure_readings', type: 'text', label: 'Blood Pressure Readings', placeholder: 'e.g., 120/80, 130/85' },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'sodium_intake', type: 'number', label: 'Sodium Intake', placeholder: 'mg/day' },
+            { name: 'alcohol_use', type: 'select', label: 'Alcohol Use', options: ['No', 'Occasional', 'Regular'] }
+        ],
+        'parkinsons': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'tremor_frequency', type: 'number', label: 'Tremor Frequency', placeholder: 'Hz' },
+            { name: 'muscle_rigidity', type: 'select', label: 'Muscle Rigidity', options: ['Low', 'Moderate', 'High'] },
+            { name: 'movement_speed', type: 'number', label: 'Movement Speed', placeholder: 'steps/sec or reaction time' },
+            { name: 'voice_patterns', type: 'text', label: 'Voice Patterns', placeholder: 'Describe voice changes' },
+            { name: 'handwriting_analysis', type: 'text', label: 'Handwriting Analysis', placeholder: 'Describe writing changes' }
+        ],
+        'alzheimer': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'memory_test_scores', type: 'number', label: 'Memory Test Scores', placeholder: 'Score' },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'brain_scan_results', type: 'text', label: 'Brain Scan Results', placeholder: 'MRI/CT findings' },
+            { name: 'lifestyle', type: 'text', label: 'Lifestyle', placeholder: 'Diet, Exercise, etc.' }
+        ],
+        'obesity': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'bmi', type: 'number', label: 'BMI', placeholder: 'Body Mass Index' },
+            { name: 'diet', type: 'select', label: 'Diet Quality', options: ['Poor', 'Average', 'Good', 'Excellent'] },
+            { name: 'exercise', type: 'select', label: 'Exercise Level', options: ['None', 'Light', 'Moderate', 'Active'] },
+            { name: 'genetics', type: 'select', label: 'Genetics', options: ['No family history', 'Yes'] },
+            { name: 'lifestyle', type: 'text', label: 'Lifestyle Factors', placeholder: 'Sedentary, Active, etc.' }
+        ],
+        'anemia': [
+            { name: 'hemoglobin', type: 'number', label: 'Hemoglobin Level', placeholder: 'g/dL' },
+            { name: 'rbc_count', type: 'number', label: 'RBC Count', placeholder: 'million cells/µL' },
+            { name: 'iron_level', type: 'number', label: 'Iron Level', placeholder: 'µg/dL' },
+            { name: 'fatigue_symptoms', type: 'select', label: 'Fatigue Symptoms', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+            { name: 'diet_info', type: 'text', label: 'Diet Information', placeholder: 'Include iron intake' }
+        ],
+        'asthma': [
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'allergy_history', type: 'select', label: 'Allergy History', options: ['No', 'Yes'] },
+            { name: 'coughing', type: 'select', label: 'Coughing Frequency', options: ['None', 'Occasional', 'Frequent'] },
+            { name: 'wheezing', type: 'select', label: 'Wheezing', options: ['No', 'Yes'] },
+            { name: 'lung_function_test', type: 'number', label: 'Lung Function Test (FEV1%)', placeholder: '%' },
+            { name: 'pollution_exposure', type: 'text', label: 'Air Pollution Exposure', placeholder: 'Describe exposure' }
+        ],
+        'covid19': [
+            { name: 'temperature', type: 'number', label: 'Body Temperature', placeholder: '°F or °C' },
+            { name: 'oxygen_level', type: 'number', label: 'Oxygen Level (SpO2)', placeholder: '%' },
+            { name: 'cough', type: 'select', label: 'Cough Severity', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+            { name: 'fever', type: 'select', label: 'Fever Presence', options: ['No', 'Yes'] },
+            { name: 'breathing_difficulty', type: 'select', label: 'Breathing Difficulty', options: ['No', 'Yes'] },
+            { name: 'travel_contact_history', type: 'text', label: 'Travel/Contact History', placeholder: 'Describe exposure' }
+        ],
+        'tuberculosis': [
+            { name: 'chronic_cough', type: 'select', label: 'Chronic Cough', options: ['No', 'Yes'] },
+            { name: 'weight_loss', type: 'select', label: 'Weight Loss', options: ['No', 'Yes'] },
+            { name: 'night_sweats', type: 'select', label: 'Night Sweats', options: ['No', 'Yes'] },
+            { name: 'chest_xray', type: 'text', label: 'Chest X-ray Results', placeholder: 'Describe findings' },
+            { name: 'blood_test', type: 'text', label: 'Blood Test Results', placeholder: 'Describe results' },
+            { name: 'sputum_test', type: 'text', label: 'Sputum Test Results', placeholder: 'Describe results' }
+        ],
+        'thyroid': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'tsh', type: 'number', label: 'TSH Level', placeholder: 'µIU/mL' },
+            { name: 't3', type: 'number', label: 'T3 Level', placeholder: 'ng/dL' },
+            { name: 't4', type: 'number', label: 'T4 Level', placeholder: 'µg/dL' },
+            { name: 'weight_change', type: 'text', label: 'Weight Changes', placeholder: 'Gain or loss' },
+            { name: 'heart_rate', type: 'number', label: 'Heart Rate', placeholder: 'bpm' },
+            { name: 'fatigue', type: 'select', label: 'Fatigue', options: ['None', 'Mild', 'Moderate', 'Severe'] }
+        ],
+        'skin_cancer': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'sun_exposure', type: 'select', label: 'Sun Exposure', options: ['Low', 'Moderate', 'High'] },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'lesion_image', type: 'file', label: 'Upload Lesion Image' },
+            { name: 'skin_type', type: 'select', label: 'Skin Type', options: ['Type I', 'Type II', 'Type III', 'Type IV', 'Type V', 'Type VI'] }
+        ],
+        'depression': [
+            { name: 'sleep_patterns', type: 'text', label: 'Sleep Patterns', placeholder: 'Hours per night, quality' },
+            { name: 'mood_reports', type: 'text', label: 'Mood Reports', placeholder: 'Daily/weekly mood notes' },
+            { name: 'stress_levels', type: 'select', label: 'Stress Levels', options: ['Low', 'Moderate', 'High'] },
+            { name: 'family_history', type: 'select', label: 'Family History', options: ['No', 'Yes'] },
+            { name: 'lifestyle_habits', type: 'text', label: 'Lifestyle Habits', placeholder: 'Exercise, diet, etc.' },
+            { name: 'social_support', type: 'select', label: 'Social Support', options: ['Poor', 'Fair', 'Good', 'Excellent'] }
+        ],
+        'pneumonia': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'fever', type: 'number', label: 'Fever Temperature', placeholder: '°F or °C' },
+            { name: 'cough', type: 'select', label: 'Cough Severity', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+            { name: 'breathing_rate', type: 'number', label: 'Breathing Rate', placeholder: 'breaths per minute' },
+            { name: 'oxygen_levels', type: 'number', label: 'Oxygen Levels', placeholder: 'SpO2 %' },
+            { name: 'chest_xray', type: 'text', label: 'Chest X-ray Results', placeholder: 'Describe findings' }
+        ],
+        'gastrointestinal': [
+            { name: 'age', type: 'number', label: 'Age', placeholder: 'Enter your age' },
+            { name: 'abdominal_pain', type: 'select', label: 'Abdominal Pain', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+            { name: 'bloating', type: 'select', label: 'Bloating', options: ['None', 'Mild', 'Moderate', 'Severe'] },
+            { name: 'diet', type: 'text', label: 'Diet Information', placeholder: 'Meals, food habits' },
+            { name: 'stress_levels', type: 'select', label: 'Stress Levels', options: ['Low', 'Moderate', 'High'] },
+            { name: 'endoscopy_results', type: 'text', label: 'Endoscopy Results', placeholder: 'Describe findings' }
+        ]
+    };
+    
+    generateFormFields(basicFields[diseaseKey] || basicFields['diabetes']);
+}
+
+        function getDiseaseDisplayName(diseaseKey) {
+            const names = {
+                'diabetes': 'Diabetes Risk Prediction',
+                'heart': 'Heart Disease Risk Prediction',
+                'breast_cancer': 'Breast Cancer Risk Assessment',
+                'lung_cancer': 'Lung Cancer Risk Assessment',
+                'kidney_disease': 'Kidney Disease Risk Assessment'
+            };
+            return names[diseaseKey] || 'Medical Risk Assessment';
+        }
+
+        async function makePrediction() {
+            // Show loading spinner
+            const spinner = predictBtn.querySelector('.loading-spinner');
+            const btnText = predictBtn.querySelector('.btn-text');
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Predicting...';
+            predictBtn.disabled = true;
+
+            try {
+                // Collect form data
+                const formData = new FormData(document.getElementById('medical-form'));
+                const data = Object.fromEntries(formData.entries());
+                
+                // Send prediction request
+                const response = await fetch(`/predict/${currentDisease}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.prediction);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Prediction error:', error);
+                alert('Error making prediction. Please try again.');
+            } finally {
+                // Hide loading spinner
+                spinner.style.display = 'none';
+                btnText.textContent = 'Predict Risk';
+                predictBtn.disabled = false;
+            }
+        }
+
+        function displayResults(prediction) {
+            // Update risk level and progress bar
+            const riskPercentage = Math.round(prediction.probability * 100);
+            riskProgress.style.width = `${riskPercentage}%`;
+            riskProgress.textContent = `${riskPercentage}%`;
+            
+            // Set risk level text and color
+            riskLevel.textContent = prediction.risk_level.toUpperCase();
+            riskLevel.className = `risk-${prediction.risk_level}`;
+            
+            // Display contributing factors
+            riskFactors.innerHTML = '<h5>Key Contributing Factors</h5>';
+            prediction.factors.forEach(factor => {
+                const factorDiv = document.createElement('div');
+                factorDiv.className = 'mb-2';
+                
+                const factorLabel = document.createElement('div');
+                factorLabel.className = 'd-flex justify-content-between';
+                factorLabel.innerHTML = `
+                    <span>${factor.name}</span>
+                    <span>${factor.contribution}%</span>
+                `;
+                
+                const factorBar = document.createElement('div');
+                factorBar.className = 'factor-bar';
+                
+                const factorValue = document.createElement('div');
+                factorValue.className = 'factor-value';
+                factorValue.style.width = `${Math.min(factor.contribution, 100)}%`;
+                
+                factorBar.appendChild(factorValue);
+                factorDiv.appendChild(factorLabel);
+                factorDiv.appendChild(factorBar);
+                riskFactors.appendChild(factorDiv);
+            });
+            
+            // Display recommendations
+            recommendations.innerHTML = '';
+            prediction.recommendations.forEach(rec => {
+                const recItem = document.createElement('div');
+                recItem.className = 'd-flex align-items-center mb-2';
+                recItem.innerHTML = `
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <span>${rec}</span>
+                `;
+                recommendations.appendChild(recItem);
+            });
+            
+            // Create risk chart
+            createRiskChart(prediction);
+            
+            // Show results
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function createRiskChart(prediction) {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.riskChartInstance) {
+                window.riskChartInstance.destroy();
+            }
+            
+            window.riskChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Risk Probability', 'Remaining'],
+                    datasets: [{
+                        data: [prediction.probability * 100, 100 - (prediction.probability * 100)],
+                        backgroundColor: [
+                            prediction.risk_level === 'high' ? '#e74c3c' : 
+                            prediction.risk_level === 'medium' ? '#f39c12' : '#2ecc71',
+                            '#ecf0f1'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw.toFixed(1)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Medical AI Diagnosis System initialized');
+        });
+    </script>
+</body>
+</html>

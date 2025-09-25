@@ -1,0 +1,10 @@
+{
+  "age": "33",
+  "gender": "Female",
+  "bmi": "324",
+  "blood_pressure": "123",
+  "glucose_level": "23",
+  "family_history": "No",
+  "physical_activity": "Sedentary",
+  "diet": "Poor"
+}

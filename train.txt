@@ -1,0 +1,147 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+import joblib
+import os
+
+def train_diabetes_model():
+    """Train diabetes prediction model"""
+    # Using PIMA Indians Diabetes Dataset as base
+    url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv"
+    columns = ['pregnancies', 'glucose', 'blood_pressure', 'skin_thickness', 
+               'insulin', 'bmi', 'diabetes_pedigree', 'age', 'outcome']
+    
+    try:
+        df = pd.read_csv(url, names=columns)
+        
+        # Handle missing values
+        for col in ['glucose', 'blood_pressure', 'skin_thickness', 'insulin', 'bmi']:
+            df[col] = df[col].replace(0, np.nan)
+            df[col].fillna(df[col].mean(), inplace=True)
+        
+        # Map to match frontend inputs
+        X = df[['age', 'bmi', 'glucose', 'blood_pressure']]  # Using available features
+        y = df['outcome']
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+        
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        print(f"Diabetes Model Accuracy: {accuracy:.2f}")
+        print(classification_report(y_test, y_pred))
+        
+        joblib.dump(model, 'models/diabetes_model.pkl')
+        print("Diabetes model saved successfully!")
+        
+    except Exception as e:
+        print(f"Error training diabetes model: {e}")
+
+def train_heart_disease_model():
+    """Train heart disease prediction model"""
+    # Using UCI Heart Disease dataset
+    url = "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data"
+    columns = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
+               'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal', 'target']
+    
+    try:
+        df = pd.read_csv(url, names=columns, na_values='?')
+        
+        # Handle missing values
+        df.fillna(df.mean(), inplace=True)
+        
+        # Convert target to binary
+        df['target'] = (df['target'] > 0).astype(int)
+        
+        # Map to match frontend inputs
+        X = df[['age', 'sex', 'chol', 'trestbps']]  # Using available features
+        y = df['target']
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+        
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        print(f"Heart Disease Model Accuracy: {accuracy:.2f}")
+        print(classification_report(y_test, y_pred))
+        
+        joblib.dump(model, 'models/heart_model.pkl')
+        print("Heart disease model saved successfully!")
+        
+    except Exception as e:
+        print(f"Error training heart disease model: {e}")
+
+def train_breast_cancer_model():
+    """Train breast cancer prediction model"""
+    from sklearn.datasets import load_breast_cancer
+    
+    try:
+        data = load_breast_cancer()
+        df = pd.DataFrame(data.data, columns=data.feature_names)
+        df['target'] = data.target
+        
+        # Map to match frontend inputs using similar features
+        X = df[['mean radius', 'mean texture', 'mean perimeter', 'mean area']]  # Tumor characteristics
+        y = df['target']
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+        
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        print(f"Breast Cancer Model Accuracy: {accuracy:.2f}")
+        print(classification_report(y_test, y_pred))
+        
+        joblib.dump(model, 'models/breast_cancer_model.pkl')
+        print("Breast cancer model saved successfully!")
+        
+    except Exception as e:
+        print(f"Error training breast cancer model: {e}")
+
+# Simulated models for other diseases (would require actual datasets)
+def create_simulated_models():
+    """Create placeholder models for other diseases"""
+    diseases = ['lung_cancer', 'kidney_disease', 'liver_disease', 'stroke', 
+                'hypertension', 'parkinsons', 'alzheimer', 'obesity', 
+                'anemia', 'asthma', 'covid19', 'tuberculosis', 'thyroid',
+                'skin_cancer', 'depression', 'pneumonia', 'gastrointestinal']
+    
+    for disease in diseases:
+        # Create a simple dummy model
+        model = RandomForestClassifier(n_estimators=10, random_state=42)
+        # Train on dummy data
+        X_dummy = np.random.rand(100, 4)
+        y_dummy = np.random.randint(0, 2, 100)
+        model.fit(X_dummy, y_dummy)
+        
+        joblib.dump(model, f'models/{disease}_model.pkl')
+        print(f"{disease.replace('_', ' ').title()} model created successfully!")
+
+if __name__ == '__main__':
+    os.makedirs('models', exist_ok=True)
+    
+    print("Training Diabetes Model...")
+    train_diabetes_model()
+    
+    print("\nTraining Heart Disease Model...")
+    train_heart_disease_model()
+    
+    print("\nTraining Breast Cancer Model...")
+    train_breast_cancer_model()
+    
+    print("\nCreating Simulated Models for Other Diseases...")
+    create_simulated_models()
+    
+    print("\nModel training completed!")

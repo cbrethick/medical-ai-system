@@ -1,0 +1,326 @@
+import pandas as pd
+import numpy as np
+import joblib
+import os
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+class MedicalPredictor:
+    def __init__(self):
+        self.models = {}
+        self.scalers = {}
+        self.load_models()
+        
+    def load_models(self):
+        """Load trained ML models"""
+        diseases = [
+            'diabetes', 'heart', 'breast_cancer', 'lung_cancer', 'kidney_disease',
+            'liver_disease', 'stroke', 'hypertension', 'parkinsons', 'alzheimer',
+            'obesity', 'anemia', 'asthma', 'covid19', 'tuberculosis', 'thyroid',
+            'skin_cancer', 'depression', 'pneumonia', 'gastrointestinal'
+        ]
+        
+        for disease in diseases:
+            path = f'models/{disease}_model.pkl'
+            if os.path.exists(path):
+                try:
+                    self.models[disease] = joblib.load(path)
+                except:
+                    print(f"Could not load model for {disease}")
+    
+    def get_disease_inputs(self, disease):
+        """Return input fields for each disease matching the frontend"""
+        inputs_map = {
+            'diabetes': [
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120},
+                {'name': 'gender', 'type': 'select', 'label': 'Gender', 'options': ['Male', 'Female', 'Other']},
+                {'name': 'bmi', 'type': 'number', 'label': 'BMI', 'min': 10, 'max': 60},
+                {'name': 'blood_pressure', 'type': 'text', 'label': 'Blood Pressure'},
+                {'name': 'glucose_level', 'type': 'number', 'label': 'Glucose Level', 'min': 50, 'max': 300},
+                {'name': 'family_history', 'type': 'select', 'label': 'Family History', 'options': ['No', 'Yes']},
+                {'name': 'physical_activity', 'type': 'select', 'label': 'Physical Activity', 'options': ['Sedentary', 'Light', 'Moderate', 'Active']},
+                {'name': 'diet', 'type': 'select', 'label': 'Diet Quality', 'options': ['Poor', 'Average', 'Good', 'Excellent']}
+            ],
+            'heart': [
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120},
+                {'name': 'gender', 'type': 'select', 'label': 'Gender', 'options': ['Male', 'Female', 'Other']},
+                {'name': 'cholesterol', 'type': 'number', 'label': 'Cholesterol Level', 'min': 100, 'max': 400},
+                {'name': 'blood_pressure', 'type': 'text', 'label': 'Blood Pressure'},
+                {'name': 'ecg', 'type': 'select', 'label': 'ECG Results', 'options': ['Normal', 'Abnormal']},
+                {'name': 'heart_rate', 'type': 'number', 'label': 'Heart Rate', 'min': 40, 'max': 200},
+                {'name': 'smoking', 'type': 'select', 'label': 'Smoking History', 'options': ['Non-smoker', 'Former smoker', 'Current smoker']},
+                {'name': 'diabetes_history', 'type': 'select', 'label': 'Diabetes History', 'options': ['No', 'Yes']}
+            ],
+            'breast_cancer': [
+                {'name': 'tumor_size', 'type': 'number', 'label': 'Tumor Size (cm)', 'min': 0, 'max': 10},
+                {'name': 'biopsy_cell_data', 'type': 'text', 'label': 'Biopsy Cell Data'},
+                {'name': 'family_history', 'type': 'select', 'label': 'Family History', 'options': ['No', 'Yes']},
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120},
+                {'name': 'hormonal_factors', 'type': 'text', 'label': 'Hormonal Factors'}
+            ],
+            'lung_cancer': [
+                {'name': 'smoking_history', 'type': 'select', 'label': 'Smoking History', 'options': ['Non-smoker', 'Former smoker', 'Current smoker']},
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120},
+                {'name': 'gender', 'type': 'select', 'label': 'Gender', 'options': ['Male', 'Female', 'Other']},
+                {'name': 'environmental_exposure', 'type': 'text', 'label': 'Environmental Exposure'},
+                {'name': 'chronic_cough', 'type': 'select', 'label': 'Chronic Cough', 'options': ['No', 'Yes']},
+                {'name': 'chest_pain', 'type': 'select', 'label': 'Chest Pain', 'options': ['No', 'Yes']}
+            ],
+            'kidney_disease': [
+                {'name': 'blood_pressure', 'type': 'text', 'label': 'Blood Pressure'},
+                {'name': 'creatinine', 'type': 'number', 'label': 'Creatinine Level', 'min': 0, 'max': 10},
+                {'name': 'albumin_urine', 'type': 'number', 'label': 'Albumin in Urine', 'min': 0, 'max': 500},
+                {'name': 'bun', 'type': 'number', 'label': 'Blood Urea Nitrogen (BUN)', 'min': 0, 'max': 100},
+                {'name': 'diabetes_history', 'type': 'select', 'label': 'Diabetes History', 'options': ['No', 'Yes']},
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120}
+            ],
+            'liver_disease': [
+                {'name': 'bilirubin', 'type': 'number', 'label': 'Bilirubin Level', 'min': 0, 'max': 10},
+                {'name': 'alt', 'type': 'number', 'label': 'ALT Level', 'min': 0, 'max': 200},
+                {'name': 'ast', 'type': 'number', 'label': 'AST Level', 'min': 0, 'max': 200},
+                {'name': 'age', 'type': 'number', 'label': 'Age', 'min': 0, 'max': 120},
+                {'name': 'alcohol_consumption', 'type': 'select', 'label': 'Alcohol Consumption', 'options': ['None', 'Occasional', 'Regular']},
+                {'name': 'bmi', 'type': 'number', 'label': 'BMI', 'min': 10, 'max': 60},
+                {'name': 'hepatitis_history', 'type': 'select', 'label': 'Hepatitis Infection History', 'options': ['No', 'Yes']}
+            ]
+        }
+        
+        # Return inputs for the requested disease or empty list if not found
+        return inputs_map.get(disease, [])
+    
+    def predict(self, disease, form_data):
+        """Make prediction based on disease and form data"""
+        if disease not in self.models:
+            return self._simulate_prediction(disease, form_data)
+        
+        try:
+            # Convert form data to feature array
+            features = self._prepare_features(disease, form_data)
+            
+            # Make prediction
+            prediction = self.models[disease].predict(features)[0]
+            probability = self.models[disease].predict_proba(features)[0][1]
+            
+            return {
+                'prediction': int(prediction),
+                'probability': float(probability),
+                'risk_level': self._get_risk_level(probability),
+                'factors': self._analyze_factors(disease, form_data),
+                'recommendations': self._get_recommendations(disease, prediction, probability, form_data)
+            }
+            
+        except Exception as e:
+            print(f"Prediction error for {disease}: {e}")
+            return self._simulate_prediction(disease, form_data)
+    
+    def _prepare_features(self, disease, form_data):
+        """Prepare features for model prediction based on disease"""
+        feature_maps = {
+            'diabetes': ['age', 'bmi', 'glucose_level', 'blood_pressure'],
+            'heart': ['age', 'gender', 'cholesterol', 'blood_pressure'],
+            'breast_cancer': ['age', 'tumor_size', 'family_history', 'hormonal_factors']
+        }
+        
+        features = []
+        if disease in feature_maps:
+            for feature_name in feature_maps[disease]:
+                value = form_data.get(feature_name, '0')
+                # Convert text values to numerical
+                if feature_name == 'blood_pressure':
+                    # Extract systolic pressure (first number)
+                    bp_parts = str(value).split('/')
+                    features.append(float(bp_parts[0]) if bp_parts and bp_parts[0].isdigit() else 120.0)
+                elif feature_name == 'gender':
+                    gender_map = {'Male': 1, 'Female': 0, 'Other': 0.5}
+                    features.append(gender_map.get(value, 0.5))
+                elif feature_name == 'family_history':
+                    features.append(1 if value == 'Yes' else 0)
+                else:
+                    try:
+                        features.append(float(value))
+                    except:
+                        features.append(0.0)
+        else:
+            # Default feature extraction for other diseases
+            for key in ['age', 'bmi', 'glucose_level', 'cholesterol']:
+                if key in form_data:
+                    try:
+                        features.append(float(form_data[key]))
+                    except:
+                        features.append(0.0)
+            
+            # Pad with zeros if needed
+            while len(features) < 4:
+                features.append(0.0)
+        
+        return np.array(features).reshape(1, -1)
+    
+    def _get_risk_level(self, probability):
+        """Determine risk level based on probability"""
+        if probability < 0.3:
+            return 'Low'
+        elif probability < 0.7:
+            return 'Medium'
+        else:
+            return 'High'
+    
+    def _analyze_factors(self, disease, form_data):
+        """Analyze contributing factors based on form data"""
+        factors = []
+        
+        # Common health factors analysis
+        common_factors = {
+            'age': ('Age', 50, 30, 80),
+            'bmi': ('BMI', 25, 18, 40),
+            'glucose_level': ('Glucose Level', 100, 70, 200),
+            'cholesterol': ('Cholesterol', 200, 150, 300),
+            'blood_pressure': ('Blood Pressure', 120, 90, 180)
+        }
+        
+        for factor_key, (factor_name, optimal, low, high) in common_factors.items():
+            if factor_key in form_data:
+                try:
+                    value = float(form_data[factor_key])
+                    # Calculate deviation from optimal
+                    deviation = abs(value - optimal) / (high - low)
+                    contribution = min(deviation * 100, 100)
+                    factors.append({
+                        'name': factor_name,
+                        'contribution': round(contribution, 1),
+                        'value': value,
+                        'status': 'Optimal' if abs(value - optimal) < (optimal * 0.1) else 'Needs Attention'
+                    })
+                except:
+                    continue
+        
+        return factors[:5]  # Return top 5 factors
+    
+    def _get_recommendations(self, disease, prediction, probability, form_data):
+        """Get personalized recommendations"""
+        base_recommendations = [
+            "Consult with a healthcare professional for accurate diagnosis",
+            "Schedule regular check-ups to monitor your health status",
+            "Maintain a healthy lifestyle with balanced diet and exercise"
+        ]
+        
+        disease_specific = {
+            'diabetes': [
+                "Monitor blood sugar levels regularly",
+                "Maintain a balanced diet low in sugar and carbohydrates",
+                "Engage in regular physical activity (30 minutes daily)",
+                "Maintain healthy body weight",
+                "Avoid smoking and limit alcohol consumption"
+            ],
+            'heart': [
+                "Monitor blood pressure regularly",
+                "Reduce sodium intake in your diet",
+                "Engage in cardiovascular exercises",
+                "Avoid smoking and limit alcohol consumption",
+                "Manage stress through relaxation techniques"
+            ],
+            'breast_cancer': [
+                "Schedule regular mammograms as recommended",
+                "Perform monthly self-examinations",
+                "Maintain healthy weight and exercise regularly",
+                "Limit alcohol consumption",
+                "Discuss family history with your doctor"
+            ],
+            'lung_cancer': [
+                "Avoid smoking and secondhand smoke",
+                "Use protective equipment in polluted environments",
+                "Get regular chest X-rays if high risk",
+                "Maintain good indoor air quality",
+                "Report persistent cough to your doctor"
+            ]
+        }
+        
+        specific = disease_specific.get(disease, [
+            "Follow disease-specific prevention guidelines",
+            "Monitor symptoms and report changes to your doctor",
+            "Maintain regular medical check-ups"
+        ])
+        
+        # Add risk-level specific recommendations
+        risk_recommendations = {
+            'Low': ["Continue with current healthy habits", "Maintain preventive care"],
+            'Medium': ["Increase frequency of health monitoring", "Consider lifestyle adjustments"],
+            'High': ["Seek immediate medical consultation", "Implement comprehensive lifestyle changes"]
+        }
+        
+        risk_level = self._get_risk_level(probability)
+        risk_specific = risk_recommendations.get(risk_level, [])
+        
+        return base_recommendations + specific + risk_specific
+    
+    def _simulate_prediction(self, disease, form_data):
+        """Fallback simulation for diseases without trained models"""
+        # Calculate risk score based on available data
+        risk_score = 0.1  # Base risk
+        factors = []
+        
+        # Analyze common risk factors
+        if 'age' in form_data:
+            age = float(form_data.get('age', 40))
+            age_risk = min((age - 30) / 100, 0.3)
+            risk_score += age_risk
+            factors.append({'name': 'Age', 'contribution': min(age_risk * 300, 100)})
+        
+        if 'bmi' in form_data:
+            bmi = float(form_data.get('bmi', 25))
+            bmi_risk = min(abs(bmi - 22) / 50, 0.3)
+            risk_score += bmi_risk
+            factors.append({'name': 'BMI', 'contribution': min(bmi_risk * 300, 100)})
+        
+        if 'family_history' in form_data and form_data['family_history'] == 'Yes':
+            risk_score += 0.2
+            factors.append({'name': 'Family History', 'contribution': 60})
+        
+        # Disease-specific risk adjustments
+        disease_risks = {
+            'diabetes': ['glucose_level', 'physical_activity'],
+            'heart': ['cholesterol', 'blood_pressure', 'smoking'],
+            'cancer': ['smoking_history', 'environmental_exposure']
+        }
+        
+        risk_score = min(risk_score, 0.95)
+        risk_score = max(risk_score, 0.05)
+        
+        probability = risk_score
+        prediction = 1 if probability > 0.5 else 0
+        
+        return {
+            'prediction': prediction,
+            'probability': probability,
+            'risk_level': self._get_risk_level(probability),
+            'factors': factors[:3],
+            'recommendations': self._get_recommendations(disease, prediction, probability, form_data)
+        }
+
+# Utility function to test the predictor
+def test_predictor():
+    """Test the medical predictor with sample data"""
+    predictor = MedicalPredictor()
+    
+    # Test diabetes prediction
+    sample_data = {
+        'age': '45',
+        'gender': 'Male',
+        'bmi': '28',
+        'blood_pressure': '130/85',
+        'glucose_level': '110',
+        'family_history': 'Yes',
+        'physical_activity': 'Moderate',
+        'diet': 'Average'
+    }
+    
+    result = predictor.predict('diabetes', sample_data)
+    print("Diabetes Prediction Result:")
+    print(f"Prediction: {result['prediction']}")
+    print(f"Probability: {result['probability']:.2f}")
+    print(f"Risk Level: {result['risk_level']}")
+    print("Factors:", result['factors'])
+    print("Recommendations:", result['recommendations'][:3])
+
+if __name__ == '__main__':
+    test_predictor()

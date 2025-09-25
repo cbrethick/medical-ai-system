@@ -1,0 +1,155 @@
+**Diabetes:**
+Age: 55
+Glucose Level: 185 mg/dL
+BMI: 28.5
+Blood Pressure: 140/90
+Family History: Yes
+Physical Activity: Sedentary
+
+**Heart Disease:**
+Age: 62
+Blood Pressure: 150/95
+Cholesterol Level: 240 mg/dL
+Heart Rate: 85 bpm
+Smoking History: Former smoker
+Diabetes History: Yes
+
+**Breast Cancer:**
+Age: 48
+Tumor Size: 2.5 cm
+Family History: Yes
+Biopsy Cell Data: Irregular cell growth with ductal features
+Hormonal Factors: First period age 12, no children
+
+**Lung Cancer:**
+Age: 58
+Smoking History: Current smoker
+Chronic Cough: Yes
+Chest Pain: Yes
+Environmental Exposure: Asbestos exposure for 10 years
+
+**Kidney Disease:**
+Age: 65
+Blood Pressure: 160/100
+Creatinine Level: 2.1 mg/dL
+Albumin in Urine: 45 mg/dL
+Blood Urea Nitrogen: 35 mg/dL
+Diabetes History: Yes
+
+**Liver Disease:**
+Age: 42
+Bilirubin Level: 3.2 mg/dL
+ALT Level: 85 U/L
+AST Level: 78 U/L
+Alcohol Consumption: Regular
+Hepatitis History: No
+
+**Stroke:**
+Age: 70
+Blood Pressure: 170/110
+Cholesterol Level: 260 mg/dL
+Diabetes History: Yes
+Smoking History: Non-smoker
+Previous Stroke History: No
+
+**Hypertension:**
+Age: 50
+BMI: 31.2
+Blood Pressure Readings: 145/95, 150/98
+Family History: Yes
+Sodium Intake: 3500 mg/day
+Alcohol Use: Occasional
+
+**Parkinson's:**
+Age: 68
+Tremor Frequency: 5 Hz
+Muscle Rigidity: Moderate
+Movement Speed: 1.2 steps/sec
+Voice Patterns: Soft and monotone speech
+Handwriting Analysis: Small and cramped writing
+
+**Alzheimer's:**
+Age: 75
+Memory Test Scores: 18/30
+Family History: No
+Brain Scan Results: Mild hippocampal atrophy
+Lifestyle: Sedentary, balanced diet
+
+**Obesity:**
+Age: 35
+BMI: 34.8
+Diet Quality: Poor
+Exercise Level: None
+Genetics: Yes
+Lifestyle Factors: Desk job, high-calorie diet
+
+**Anemia:**
+Hemoglobin Level: 10.5 g/dL
+RBC Count: 3.8 million cells/µL
+Iron Level: 35 µg/dL
+Fatigue Symptoms: Moderate
+Diet Information: Low iron intake, vegetarian
+
+**Asthma:**
+Family History: Yes
+Allergy History: Yes
+Coughing Frequency: Frequent
+Wheezing: Yes
+Lung Function Test: 75%
+Air Pollution Exposure: Urban area with high traffic
+
+**COVID-19:**
+Temperature: 38.5°C
+Oxygen Level: 92%
+Cough Severity: Moderate
+Fever Presence: Yes
+Breathing Difficulty: Yes
+Travel/Contact History: Recent international travel
+
+**Tuberculosis:**
+Chronic Cough: Yes
+Weight Loss: Yes
+Night Sweats: Yes
+Chest X-ray Results: Upper lobe infiltrates
+Blood Test Results: Positive IGRA
+Sputum Test Results: Acid-fast bacilli present
+
+**Thyroid:**
+Age: 45
+TSH Level: 0.1 µIU/mL
+T3 Level: 220 ng/dL
+T4 Level: 15 µg/dL
+Weight Changes: Unexplained weight loss
+Heart Rate: 110 bpm
+Fatigue: Mild
+
+**Skin Cancer:**
+Age: 60
+Sun Exposure: High
+Family History: No
+Lesion Image: [file upload]
+Skin Type: Type II
+
+**Depression:**
+Sleep Patterns: 5 hours per night, poor quality
+Mood Reports: Low mood most days, lack of interest
+Stress Levels: High
+Family History: Yes
+Lifestyle Habits: Minimal exercise, irregular meals
+Social Support: Fair
+
+**Pneumonia:**
+Age: 72
+Fever Temperature: 39.2°C
+Cough Severity: Severe
+Breathing Rate: 28 breaths/minute
+Oxygen Levels: 88%
+Chest X-ray Results: Right lower lobe consolidation
+
+**Gastrointestinal:**
+Age: 38
+Abdominal Pain: Moderate
+Bloating: Severe
+Diet Information: High fat, low fiber
+Stress Levels: High
+Endoscopy Results: Mild gastritis, no ulcers

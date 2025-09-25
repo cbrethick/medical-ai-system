@@ -1,0 +1,10 @@
+{
+  "age": "55",
+  "gender": "Male",
+  "bmi": "185",
+  "blood_pressure": "25.7",
+  "glucose_level": "14090",
+  "family_history": "Yes",
+  "physical_activity": "Sedentary",
+  "diet": "Poor"
+}

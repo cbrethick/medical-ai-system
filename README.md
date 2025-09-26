@@ -1,9 +1,4 @@
 🏥 Healthcare AI Prediction System
+<img width="856" height="488" alt="image" src="https://github.com/user-attachments/assets/48f61201-392f-497c-8b91-d1d0acd6096e" />
 
-<div align="center">
-https://img.shields.io/badge/Python-3.8%252B-blue
-https://img.shields.io/badge/Machine-Learning-orange
-https://img.shields.io/badge/Healthcare-AI-green
-https://img.shields.io/badge/Web-Application-lightgrey
-https://img.shields.io/badge/License-MIT-yellow
 
